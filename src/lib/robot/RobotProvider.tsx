@@ -196,7 +196,10 @@ export function RobotProvider({ children }: { children: ReactNode }) {
     (key: MechanismKey, on: boolean) =>
       run(`mech:${key}`, `${key} ${on ? "ON" : "OFF"}`, (c) => c.setMechanism(key, on), (json) => {
         const confirmed = confirmMechanism(json, key);
-        if (confirmed === null) return unconfirmed(key);
+        if (confirmed === null) {
+          unconfirmed(key);
+          return;
+        }
         setStatus((s) => (s ? { ...s, mechanisms: { ...s.mechanisms, [key]: confirmed } } : s));
       }),
     [run],
@@ -206,7 +209,10 @@ export function RobotProvider({ children }: { children: ReactNode }) {
     (action: GripperAction) =>
       run("gripper", `Gripper ${action}`, (c) => c.gripper(action), (json) => {
         const confirmed = confirmAction(json, GRIPPER_ACTIONS);
-        if (!confirmed) return unconfirmed("Gripper");
+        if (!confirmed) {
+          unconfirmed("Gripper");
+          return;
+        }
         setStatus((s) => (s ? { ...s, gripper: confirmed } : s));
       }),
     [run],
@@ -216,7 +222,10 @@ export function RobotProvider({ children }: { children: ReactNode }) {
     (action: LiftAction) =>
       run("lift", `Lift ${action}`, (c) => c.lift(action), (json) => {
         const confirmed = confirmAction(json, LIFT_ACTIONS);
-        if (!confirmed) return unconfirmed("Lift");
+        if (!confirmed) {
+          unconfirmed("Lift");
+          return;
+        }
         setStatus((s) => (s ? { ...s, lift: confirmed } : s));
       }),
     [run],
@@ -226,7 +235,10 @@ export function RobotProvider({ children }: { children: ReactNode }) {
     (direction: MoveDirection) =>
       run(direction === "stop" ? "move:stop" : "move", `Move ${direction}`, (c) => c.move(direction), (json) => {
         const confirmed = confirmAction(json, MOVE_DIRECTIONS);
-        if (!confirmed) return unconfirmed("Movement");
+        if (!confirmed) {
+          unconfirmed("Movement");
+          return;
+        }
         setStatus((s) => (s ? { ...s, move: confirmed } : s));
       }, { force: direction === "stop" && isOnline }),
     [run, isOnline],
@@ -237,7 +249,10 @@ export function RobotProvider({ children }: { children: ReactNode }) {
     () =>
       run("estop", "Emergency stop", (c) => c.emergencyStop(), (json) => {
         const ok = typeof json === "object" && json !== null && (json as { ok?: unknown }).ok === true;
-        if (!ok) return unconfirmed("Emergency stop");
+        if (!ok) {
+          unconfirmed("Emergency stop");
+          return;
+        }
         setStatus((s) =>
           s ? { ...s, robot: "stopped", mechanisms: { ...ALL_OFF }, gripper: "stop", lift: "stop", move: "stop" } : s,
         );

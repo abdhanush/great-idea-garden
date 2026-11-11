@@ -36,9 +36,11 @@ export function createHttpClient(host: string): RobotClient | null {
         signal: ctrl.signal,
         cache: "no-store",
         // text/plain keeps this a "simple" CORS request (no preflight) — the ESP32 parses the JSON body.
-        headers: body ? { "Content-Type": "text/plain;charset=UTF-8" } : undefined,
-        body: body ? JSON.stringify(body) : undefined,
       };
+      if (body) {
+        init.headers = { "Content-Type": "text/plain;charset=UTF-8" };
+        init.body = JSON.stringify(body);
+      }
       // Lets secure pages reach a robot on the local Wi-Fi (Chrome Local Network Access).
       if (local) init.targetAddressSpace = "local";
       let res: Response;
