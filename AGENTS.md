@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Robot I/O lives in `src/lib/robot/` (client, pure logic, provider); screens only call `useRobot()`. Why: one place enforces confirmation, cooldown and disconnect safety.
+- UI state for mechanisms/arm changes only from an ESP32 reply with `ok:true` (see `confirmMechanism`/`confirmAction`); never optimistic. Why: the brief forbids showing ON without hardware confirmation.
+- POST bodies are JSON sent as `text/plain` and fetches to private IPs set `targetAddressSpace: "local"`. Why: avoids CORS preflight on the ESP32 and lets the HTTPS app reach the robot on local Wi-Fi.
+- Demo mode is a separate in-browser client (`demo.ts`) chosen only by the user's setting; never fall back to it automatically. Why: no simulated readings in the connected app.
