@@ -51,7 +51,10 @@ function SettingsPage() {
 
   const test = async () => {
     const c = createHttpClient(draft.host);
-    if (!c) return toast.error("That IP address doesn't look right");
+    if (!c) {
+      toast.error("That IP address doesn't look right");
+      return;
+    }
     setTesting(true);
     try {
       await c.getStatus();

@@ -99,7 +99,7 @@ function ArmPage() {
   );
 }
 
-function StateChip({ value, busy }: { value?: string | null; busy: boolean }) {
+function StateChip({ value, busy }: { value?: string | null | undefined; busy: boolean }) {
   return (
     <span
       className={cn(
@@ -121,7 +121,7 @@ function ActionGroup<T extends string>({
   actions,
 }: {
   title: string;
-  current?: T | null;
+  current?: T | null | undefined;
   busy: boolean;
   disabled: boolean;
   onAction: (a: T) => void;

@@ -42,7 +42,7 @@ interface RobotContextValue {
   sensors: SensorReadings | null;
   lastUpdate: number | null;
   lastError: string | null;
-  pending: Record<string, boolean>;
+  pending: PendingMap;
   reconnect: () => void;
   setMechanism: (key: MechanismKey, on: boolean) => Promise<void>;
   gripper: (action: GripperAction) => Promise<void>;
@@ -50,6 +50,9 @@ interface RobotContextValue {
   move: (direction: MoveDirection) => Promise<void>;
   emergencyStop: () => Promise<void>;
 }
+
+export type PendingKey = "estop" | "gripper" | "lift" | "move" | "move:stop" | `mech:${MechanismKey}`;
+type PendingMap = Partial<Record<PendingKey, boolean>>;
 
 const RobotContext = createContext<RobotContextValue | null>(null);
 
@@ -69,10 +72,10 @@ export function RobotProvider({ children }: { children: ReactNode }) {
   const [sensors, setSensors] = useState<SensorReadings | null>(null);
   const [lastUpdate, setLastUpdate] = useState<number | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
-  const [pending, setPending] = useState<Record<string, boolean>>({});
+  const [pending, setPending] = useState<PendingMap>({});
   const [nonce, setNonce] = useState(0);
-  const pendingRef = useRef(new Set<string>());
-  const lastSentRef = useRef<Record<string, number>>({});
+  const pendingRef = useRef(new Set<PendingKey>());
+  const lastSentRef = useRef<Partial<Record<PendingKey, number>>>({});
 
   useEffect(() => {
     try {
@@ -155,7 +158,7 @@ export function RobotProvider({ children }: { children: ReactNode }) {
   }, [client, settingsReady, settings.pollMs, settings.demoMode, nonce]);
 
   const run = useCallback(
-    async (key: string, label: string, fn: (c: RobotClient) => Promise<unknown>, onReply: (json: unknown) => void, opts?: { force?: boolean }) => {
+    async (key: PendingKey, label: string, fn: (c: RobotClient) => Promise<unknown>, onReply: (json: unknown) => void, opts?: { force?: boolean }) => {
       if (!client) {
         toast.error("Set the robot's IP address first");
         return;
