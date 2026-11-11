@@ -3,7 +3,7 @@ import { useRobot } from "@/lib/robot/RobotProvider";
 
 const LABELS = {
   connected: "Connected",
-  demo: "Demo mode",
+  demo: "Demo",
   connecting: "Connecting…",
   disconnected: "Disconnected",
   unconfigured: "No IP set",
@@ -21,7 +21,7 @@ export function ConnectionPill({ className }: { className?: string }) {
           : "text-destructive bg-destructive/10 border-destructive/30";
   return (
     <span
-      className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold", tone, className)}
+      className={cn("inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold", tone, className)}
       role="status"
       aria-live="polite"
     >
